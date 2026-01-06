@@ -1,8 +1,9 @@
  require("dotenv").config();
-
 const express = require("express");
-const connectDB = require("./src/config/db");
+
 const authRoute = require("./src/routes/auth.routes");
+const connectDB = require("./src/config/db");
+const errorMiddleware = require("./src/middlewares/error-middleware");
 
 const app = express();
 
@@ -15,6 +16,9 @@ app.use("/api/auth", authRoute);
 app.get("/test", (req, res) => {
   res.status(200).send("Welcome to Test Page");
 });
+
+//Error handler (must be after routes)
+app.use(errorMiddleware)
 
 const PORT = process.env.PORT || 4000;
 
