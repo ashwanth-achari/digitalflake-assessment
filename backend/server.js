@@ -6,6 +6,12 @@ const authRoute = require("./src/routes/auth.routes");
 
 const app = express();
 
+app.use(express.json());
+
+//routes
+app.use("/api/auth", authRoute);
+
+//test route
 app.get("/test", (req, res) => {
   res.status(200).send("Welcome to Test Page");
 });
