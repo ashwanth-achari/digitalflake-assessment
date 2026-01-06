@@ -1,0 +1,44 @@
+backend/
+│
+├── src/
+│   │
+│   ├── config/
+│   │   ├── db.js
+│   │   └── env.js
+│   │
+│   ├── models/
+│   │   ├── User.js
+│   │   ├── Category.js
+│   │   ├── SubCategory.js
+│   │   └── Product.js
+│   │
+│   ├── routes/
+│   │   ├── auth.routes.js
+│   │   ├── category.routes.js
+│   │   ├── subcategory.routes.js
+│   │   └── product.routes.js
+│   │
+│   ├── controllers/
+│   │   ├── auth.controller.js
+│   │   ├── category.controller.js
+│   │   ├── subcategory.controller.js
+│   │   └── product.controller.js
+│   │
+│   ├── middleware/
+│   │   ├── auth.middleware.js
+│   │   └── error.middleware.js
+│   │
+│   ├── utils/
+│   │   ├── jwt.js
+│   │   ├── bcrypt.js
+│   │   └── response.js
+│   │
+│   ├── uploads/
+│   │   └── images/
+│   │
+│   ├── app.js
+│   └── server.js
+│
+├── .env
+├── package.json
+└── README.md

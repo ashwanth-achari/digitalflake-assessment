@@ -1,0 +1,72 @@
+frontend/
+│
+├── public/
+│   └── index.html
+│
+├── src/
+│   │
+│   ├── assets/
+│   │   ├── images/
+│   │   └── icons/
+│   │
+│   ├── components/
+│   │   ├── common/
+│   │   │   ├── Button.jsx
+│   │   │   ├── Input.jsx
+│   │   │   ├── Modal.jsx
+│   │   │   ├── Table.jsx
+│   │   │   └── Loader.jsx
+│   │   │
+│   │   ├── layout/
+│   │   │   ├── Sidebar.jsx
+│   │   │   ├── Header.jsx
+│   │   │   └── DashboardLayout.jsx
+│   │   │
+│   │   └── auth/
+│   │       └── ProtectedRoute.jsx
+│   │
+│   ├── pages/
+│   │   ├── auth/
+│   │   │   ├── Login.jsx
+│   │   │   └── ForgotPassword.jsx
+│   │   │
+│   │   ├── dashboard/
+│   │   │   └── Home.jsx
+│   │   │
+│   │   ├── category/
+│   │   │   ├── CategoryList.jsx
+│   │   │   ├── AddCategory.jsx
+│   │   │   └── EditCategory.jsx
+│   │   │
+│   │   ├── subcategory/
+│   │   │   ├── SubCategoryList.jsx
+│   │   │   ├── AddSubCategory.jsx
+│   │   │   └── EditSubCategory.jsx
+│   │   │
+│   │   └── product/
+│   │       ├── ProductList.jsx
+│   │       ├── AddProduct.jsx
+│   │       └── EditProduct.jsx
+│   │
+│   ├── services/
+│   │   ├── api.js
+│   │   ├── auth.service.js
+│   │   ├── category.service.js
+│   │   ├── subcategory.service.js
+│   │   └── product.service.js
+│   │
+│   ├── context/
+│   │   └── AuthContext.jsx
+│   │
+│   ├── routes/
+│   │   └── AppRoutes.jsx
+│   │
+│   ├── utils/
+│   │   ├── constants.js
+│   │   └── helpers.js
+│   │
+│   ├── App.jsx
+│   └── main.jsx
+│
+├── package.json
+└── tailwind.config.js / bootstrap setup
