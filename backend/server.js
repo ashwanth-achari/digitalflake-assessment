@@ -2,6 +2,7 @@
 const express = require("express");
 
 const authRoute = require("./src/routes/auth.routes");
+const categoryRoutes = require("./src/routes/category.routes");
 const connectDB = require("./src/config/db");
 const errorMiddleware = require("./src/middlewares/error-middleware");
 
@@ -11,6 +12,7 @@ app.use(express.json());
 
 //routes
 app.use("/api/auth", authRoute);
+app.use("/api/categories", categoryRoutes);
 
 //test route
 app.get("/test", (req, res) => {
