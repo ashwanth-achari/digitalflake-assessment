@@ -3,6 +3,7 @@ const express = require("express");
 
 const authRoute = require("./src/routes/auth.routes");
 const categoryRoutes = require("./src/routes/category.routes");
+const subCategoryRoutes = require("./src/routes/subcategory.routes");
 const connectDB = require("./src/config/db");
 const errorMiddleware = require("./src/middlewares/error-middleware");
 
@@ -13,6 +14,7 @@ app.use(express.json());
 //routes
 app.use("/api/auth", authRoute);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/subcategories", subCategoryRoutes);
 
 //test route
 app.get("/test", (req, res) => {

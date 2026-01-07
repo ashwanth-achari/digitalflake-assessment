@@ -1,33 +1,39 @@
 const express = require("express");
 const router = express.Router();
 
-const {
-  createCategory,
-  getAllCategories,
-  getCategoryById,
-  updateCategory,
-  deleteCategory,
-} = require("../controllers/category.controller");
-const { categorySchema } = require("../validators/category.schema");
+const categoryController = require("../controllers/category.controller");
+const { createCategorySchema } = require("../validators/category.create.schema");
+const { updateCategorySchema } = require("../validators/category.update.schema");
 const validate = require("../middlewares/validate-middleware");
 const authMiddleware = require("../middlewares/auth-middleware");
+const upload = require("../middlewares/upload-middleware");
 
-// Protect All category routes
+// protect all routes
 router.use(authMiddleware);
 
-// Create category
-router.post("/", validate(categorySchema), createCategory);
+// create category
+router.post(
+  "/",
+  upload.single("image"),
+  validate(createCategorySchema),
+  categoryController.createCategory
+);
 
-// Get all categories
-router.get("/", getAllCategories);
+// get all
+router.get("/", categoryController.getAllCategories);
 
-// Get single category
-router.get("/:id", getCategoryById);
+// get one
+router.get("/:id", categoryController.getCategoryById);
 
-// Update category
-router.put("/:id", validate(categorySchema), updateCategory);
+// update
+router.put(
+  "/:id",
+  upload.single("image"),
+  validate(updateCategorySchema),
+  categoryController.updateCategory
+);
 
-// Soft delete category
-router.delete("/:id", deleteCategory);
+// soft delete
+router.delete("/:id", categoryController.deleteCategory);
 
 module.exports = router;

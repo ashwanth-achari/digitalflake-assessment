@@ -1,13 +1,21 @@
 const Category = require("../models/Category-model");
+const uploadToCloudinary = require("../utils/cloudinary-upload");
+const isValidObjectId = require("../utils/isValidObjectId");
 
-// create category
 const createCategory = async (req, res, next) => {
   try {
-    const { name, image, status } = req.body;
+    const { name, status } = req.body;
 
-    // Check duplicate category
+    // image validation
+    if (!req.file) {
+      return next({
+        status: 400,
+        message: "Category image is required",
+      });
+    }
+
+    // duplicate name check
     const existingCategory = await Category.findOne({ name });
-
     if (existingCategory) {
       return next({
         status: 409,
@@ -15,9 +23,15 @@ const createCategory = async (req, res, next) => {
       });
     }
 
+    // upload image to cloudinary
+    const uploadedImage = await uploadToCloudinary(
+      req.file.buffer,
+      "categories"
+    );
+
     const category = await Category.create({
       name,
-      image,
+      image: uploadedImage.secure_url,
       status,
     });
 
@@ -30,10 +44,11 @@ const createCategory = async (req, res, next) => {
   }
 };
 
-// get all categories
+//get all categories
 const getAllCategories = async (req, res, next) => {
   try {
-    const categories = await Category.find().sort({ createdAt: -1 });
+    const categories = await Category.find()
+      .sort({ createdAt: -1 });
 
     res.status(200).json({
       total: categories.length,
@@ -44,10 +59,20 @@ const getAllCategories = async (req, res, next) => {
   }
 };
 
-// get single category(for edit)
+//get single category
 const getCategoryById = async (req, res, next) => {
   try {
-    const category = await Category.findById(req.params.id);
+    const { id } = req.params;
+    console.log(req.params.id);
+
+    if (!isValidObjectId(id)) {
+      return next({
+        status: 400,
+        message: "Invalid category ID",
+      });
+    }
+
+    const category = await Category.findById(id);
 
     if (!category) {
       return next({
@@ -62,11 +87,20 @@ const getCategoryById = async (req, res, next) => {
   }
 };
 
-// update category
+
+//update category
 const updateCategory = async (req, res, next) => {
   try {
-    const category = await Category.findById(req.params.id);
+    const { id } = req.params;
 
+    if (!isValidObjectId(id)) {
+      return next({
+        status: 400,
+        message: "Invalid category ID",
+      });
+    }
+
+    const category = await Category.findById(id);
     if (!category) {
       return next({
         status: 404,
@@ -74,7 +108,19 @@ const updateCategory = async (req, res, next) => {
       });
     }
 
-    Object.assign(category, req.body);
+    // if image updated
+    if (req.file) {
+      const uploadedImage = await uploadToCloudinary(
+        req.file.buffer,
+        "categories"
+      );
+      category.image = uploadedImage.secure_url;
+    }
+
+    // update other fields
+    if (req.body.name) category.name = req.body.name;
+    if (req.body.status) category.status = req.body.status;
+
     await category.save();
 
     res.status(200).json({
@@ -86,11 +132,19 @@ const updateCategory = async (req, res, next) => {
   }
 };
 
-// delete(soft) category
+//soft delete category
 const deleteCategory = async (req, res, next) => {
   try {
-    const category = await Category.findById(req.params.id);
+    const { id } = req.params;
 
+    if (!isValidObjectId(id)) {
+      return next({
+        status: 400,
+        message: "Invalid category ID",
+      });
+    }
+
+    const category = await Category.findById(id);
     if (!category) {
       return next({
         status: 404,
