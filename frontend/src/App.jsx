@@ -11,6 +11,7 @@ import SubCategories from "./pages/SubCategories";
 import Products from "./pages/Products";
 import CategoryUpdate from "./pages/CategoryUpdate";
 import Logout from "./services/Logout";
+import CategoryCreate from "./pages/CategoryCreate";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
         <Route path="subcategories" element={<SubCategories />} />
         <Route path="products" element={<Products />} />
         <Route path="/categories/:id" element={<CategoryUpdate />} />
+        <Route path="/categories/create" element={<CategoryCreate />} />
       </Route>
 
       {/* Fallback */}
