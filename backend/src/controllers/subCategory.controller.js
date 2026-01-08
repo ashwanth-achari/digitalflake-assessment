@@ -1,36 +1,46 @@
 const SubCategory = require("../models/SubCategory-model");
 const Category = require("../models/Category-model");
+const uploadToCloudinary = require("../utils/cloudinary-upload");
+const isValidObjectId = require("../utils/isValidObjectId");
 
-// CREATE SUBCATEGORY
+// CREATE
 const createSubCategory = async (req, res, next) => {
   try {
-    const { name, image, categoryId, status } = req.body;
+    const { name, categoryId, status } = req.body;
 
-    // Check if category exists
-    const category = await Category.findById(categoryId);
-    if (!category) {
+    // image required
+    if (!req.file) {
       return next({
-        status: 404,
-        message: "Category not found",
+        status: 400,
+        message: "Subcategory image is required",
       });
     }
 
-    // Prevent duplicate subcategory in same category
-    const existingSubCategory = await SubCategory.findOne({
-      name,
-      categoryId,
-    });
+    if (!isValidObjectId(categoryId)) {
+      return next({ status: 400, message: "Invalid category ID" });
+    }
 
-    if (existingSubCategory) {
+    const category = await Category.findById(categoryId);
+    if (!category) {
+      return next({ status: 404, message: "Category not found" });
+    }
+
+    const exists = await SubCategory.findOne({ name, categoryId });
+    if (exists) {
       return next({
         status: 409,
         message: "Subcategory already exists in this category",
       });
     }
 
+    const uploadedImage = await uploadToCloudinary(
+      req.file.buffer,
+      "subcategories"
+    );
+
     const subCategory = await SubCategory.create({
       name,
-      image,
+      image: uploadedImage.secure_url,
       categoryId,
       status,
     });
@@ -44,7 +54,7 @@ const createSubCategory = async (req, res, next) => {
   }
 };
 
-// GET ALL SUBCATEGORIES
+// GET ALL
 const getAllSubCategories = async (req, res, next) => {
   try {
     const subCategories = await SubCategory.find()
@@ -60,19 +70,22 @@ const getAllSubCategories = async (req, res, next) => {
   }
 };
 
-// GET SINGLE SUBCATEGORY
+// GET ONE
 const getSubCategoryById = async (req, res, next) => {
   try {
-    const subCategory = await SubCategory.findById(req.params.id).populate(
+    const { id } = req.params;
+
+    if (!isValidObjectId(id)) {
+      return next({ status: 400, message: "Invalid subcategory ID" });
+    }
+
+    const subCategory = await SubCategory.findById(id).populate(
       "categoryId",
       "name"
     );
 
     if (!subCategory) {
-      return next({
-        status: 404,
-        message: "Subcategory not found",
-      });
+      return next({ status: 404, message: "Subcategory not found" });
     }
 
     res.status(200).json(subCategory);
@@ -81,19 +94,46 @@ const getSubCategoryById = async (req, res, next) => {
   }
 };
 
-// UPDATE SUBCATEGORY
+// UPDATE
 const updateSubCategory = async (req, res, next) => {
   try {
-    const subCategory = await SubCategory.findById(req.params.id);
+    const { id } = req.params;
+    const { name, categoryId, status } = req.body;
 
-    if (!subCategory) {
-      return next({
-        status: 404,
-        message: "Subcategory not found",
-      });
+    if (!isValidObjectId(id)) {
+      return next({ status: 400, message: "Invalid subcategory ID" });
     }
 
-    Object.assign(subCategory, req.body);
+    const subCategory = await SubCategory.findById(id);
+    if (!subCategory) {
+      return next({ status: 404, message: "Subcategory not found" });
+    }
+
+    // image optional
+    if (req.file) {
+      const uploadedImage = await uploadToCloudinary(
+        req.file.buffer,
+        "subcategories"
+      );
+      subCategory.image = uploadedImage.secure_url;
+    }
+
+    if (categoryId) {
+      if (!isValidObjectId(categoryId)) {
+        return next({ status: 400, message: "Invalid category ID" });
+      }
+
+      const category = await Category.findById(categoryId);
+      if (!category) {
+        return next({ status: 404, message: "Category not found" });
+      }
+
+      subCategory.categoryId = categoryId;
+    }
+
+    if (name) subCategory.name = name;
+    if (status) subCategory.status = status;
+
     await subCategory.save();
 
     res.status(200).json({
@@ -105,16 +145,18 @@ const updateSubCategory = async (req, res, next) => {
   }
 };
 
-// SOFT DELETE SUBCATEGORY
+// DELETE (SOFT)
 const deleteSubCategory = async (req, res, next) => {
   try {
-    const subCategory = await SubCategory.findById(req.params.id);
+    const { id } = req.params;
 
+    if (!isValidObjectId(id)) {
+      return next({ status: 400, message: "Invalid subcategory ID" });
+    }
+
+    const subCategory = await SubCategory.findById(id);
     if (!subCategory) {
-      return next({
-        status: 404,
-        message: "Subcategory not found",
-      });
+      return next({ status: 404, message: "Subcategory not found" });
     }
 
     subCategory.status = "inactive";

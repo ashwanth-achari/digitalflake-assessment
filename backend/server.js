@@ -1,5 +1,6 @@
  require("dotenv").config();
 const express = require("express");
+const cors = require("cors");
 
 const authRoute = require("./src/routes/auth.routes");
 const categoryRoutes = require("./src/routes/category.routes");
@@ -8,6 +9,19 @@ const connectDB = require("./src/config/db");
 const errorMiddleware = require("./src/middlewares/error-middleware");
 
 const app = express();
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://devash-services.vercel.app",
+];
+
+const corsOptions = {
+  origin: allowedOrigins,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
 

@@ -2,34 +2,43 @@ const express = require("express");
 const router = express.Router();
 
 const subCategoryController = require("../controllers/subCategory.controller");
-const { subCategorySchema } = require("../validators/subCategory.schema");
 const validate = require("../middlewares/validate-middleware");
 const authMiddleware = require("../middlewares/auth-middleware");
+const upload = require("../middlewares/upload-middleware");
 
-// Protect all routes
+const {
+  createSubCategorySchema,
+} = require("../validators/subCategory.create.schema");
+const {
+  updateSubCategorySchema,
+} = require("../validators/subCategory.update.schema");
+
+// protect routes
 router.use(authMiddleware);
 
-// Create subcategory
+// create
 router.post(
   "/",
-  validate(subCategorySchema),
+  upload.single("image"),
+  validate(createSubCategorySchema),
   subCategoryController.createSubCategory
 );
 
-// Get all subcategories
+// get all
 router.get("/", subCategoryController.getAllSubCategories);
 
-// Get single subcategory
+// get one
 router.get("/:id", subCategoryController.getSubCategoryById);
 
-// Update subcategory
+// update
 router.put(
   "/:id",
-  validate(subCategorySchema),
+  upload.single("image"),
+  validate(updateSubCategorySchema),
   subCategoryController.updateSubCategory
 );
 
-// Soft delete subcategory
+// delete
 router.delete("/:id", subCategoryController.deleteSubCategory);
 
 module.exports = router;

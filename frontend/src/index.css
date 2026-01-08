@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+.toastBody {
+  @apply text-2xl font-sans;
+  z-index: 9999999;
+}
