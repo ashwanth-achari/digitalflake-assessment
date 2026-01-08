@@ -46,7 +46,7 @@ function Login() {
         storeTokenInLS(res_Data.token);
         setUser({ email: "", password: "" });
         toast.success("Login Successfull");
-        navigate("/dashboard");
+        navigate("/");
       } else {
         toast.error(
           res_Data.message ? res_Data.message : res_Data.extraDetails

@@ -1,15 +1,13 @@
-import React from 'react'
-import Navbar from '../components/Navbar'
-import { Sidebar } from 'lucide-react'
-
-function Home() {
+const Home = () => {
   return (
-    <>
-    <Navbar/>
-    <Sidebar/>
-    <h1>Home</h1>
-    </>
-  )
-}
+    <div className="bg-white h-screen flex flex-col justify-center items-center p-8 shadow-xl rounded-lg">
+      <img  src="/src/assets/home-logo.png" alt="logo" />
 
-export default Home
+      <p className="text-black">
+        Welcome to Digitalflake Admin
+      </p>
+    </div>
+  );
+};
+
+export default Home;

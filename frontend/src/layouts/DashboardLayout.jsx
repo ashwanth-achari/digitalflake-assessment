@@ -1,27 +1,17 @@
-import React from "react";
-import { NavLink, Outlet } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import Sidebar from "../components/Sidebar";
+import { Outlet } from "react-router-dom";
 
 const DashboardLayout = () => {
   return (
-    <div className="admin-panel-layout">
-      {/* Sidebar */}
-      <aside className="apl-sidebar">
-        
-        <nav className="apl-nav">
-          <NavLink to="/" className="apl-link">
-            
-            <span>Users</span>
-          </NavLink>
-          <NavLink to="/category" className="apl-link">
-            
-            <span>Contacts</span>
-          </NavLink>
-        </nav>
-      </aside>
-      <main className="apl-main">
-        <Outlet />
-      </main>
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      <div className="flex flex-1">
+        <Sidebar />
+        <main className="flex-1 bg-white p-6">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 };
