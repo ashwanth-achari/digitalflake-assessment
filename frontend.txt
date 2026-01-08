@@ -27,5 +27,3 @@ src/
 │   └── AuthContext.jsx
 
 
-
- 

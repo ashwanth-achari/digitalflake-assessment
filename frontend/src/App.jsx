@@ -9,6 +9,8 @@ import NotFound from "./pages/NotFound";
 import Categories from "./pages/Categories";
 import SubCategories from "./pages/SubCategories";
 import Products from "./pages/Products";
+import CategoryUpdate from "./pages/CategoryUpdate";
+import Logout from "./services/Logout";
 
 function App() {
   return (
@@ -27,9 +29,11 @@ function App() {
         }
       >
         <Route index element={<Home />} />
+        <Route path="/logout" element={<Logout/>} />
         <Route path="categories" element={<Categories />} />
         <Route path="subcategories" element={<SubCategories />} />
         <Route path="products" element={<Products />} />
+        <Route path="/categories/:id" element={<CategoryUpdate />} />
       </Route>
 
       {/* Fallback */}

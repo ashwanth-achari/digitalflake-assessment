@@ -1,16 +1,82 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "../store/AuthContext";
+import Popup from "reactjs-popup";
+import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
+  const [deletingId, setDeletingId] = useState(null);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
+  const { authorizationToken, API } = useAuth();
+
+  //getting all the category data
+  const getAllCategoryData = async () => {
+    try {
+      // setIsFetching(true);
+
+      const URL = `${API}/api/categories`;
+      const options = {
+        method: "GET",
+        headers: {
+          Authorization: authorizationToken,
+        },
+      };
+
+      const response = await fetch(URL, options);
+      const data = await response.json();
+
+      console.log("category data", data);
+      if (response.ok) {
+        setCategories(data.categories || []);
+        setLoading(false);
+      } else {
+        toast.error(
+          data.extraDetails || data.message || "Failed to load contacts."
+        );
+        setCategories([]);
+      }
+    } catch (error) {
+      console.log("Error fetching contacts:", error);
+      toast.error("Something went wrong while loading contacts.");
+      setCategories([]);
+    } finally {
+      // setIsFetching(false);
+    }
+  };
+
+  //delete category by ID
+  const deleteCategory = async (id) => {
+    try {
+      setDeletingId(id);
+
+      const URL = `${API}/api/categories/${id}`;
+      const response = await fetch(URL, {
+        method: "DELETE",
+        headers: {
+          Authorization: authorizationToken,
+        },
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setCategories((prev) => prev.filter((cat) => cat._id !== id));
+        toast.success("Category deleted successfully");
+      } else {
+        toast.error(data.message || "Category not deleted");
+      }
+    } catch (error) {
+      toast.error("Something went wrong while deleting category");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   useEffect(() => {
-    // TEMP: simulate API call
-    setTimeout(() => {
-      setCategories([]); // replace with API data later
-      setLoading(false);
-    }, 500);
+    getAllCategoryData();
   }, []);
 
   const filteredCategories = categories.filter((cat) =>
@@ -46,7 +112,7 @@ const Categories = () => {
         <div>
           <button
             onClick={() => console.log("Navigate to add category")}
-            className="bg-[#662671] text-white px-4 py-2 rounded-md text-sm hover:bg-purple-800"
+            className="bg-[#662671] text-white px-4 py-2 rounded-md text-sm"
           >
             Add New
           </button>
@@ -60,29 +126,135 @@ const Categories = () => {
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-full border">
-            <thead className="bg-gray-100 text-sm text-gray-700">
+          <table className="min-w-full border-separate border-spacing-y-3">
+            <thead className="bg-[#FFF8B7] text-md text-gray-700 ">
               <tr>
-                <th className="px-4 py-2 text-left">ID</th>
-                <th className="px-4 py-2 text-left">Category Name</th>
-                <th className="px-4 py-2 text-left">Image</th>
-                <th className="px-4 py-2 text-left">Status</th>
-                <th className="px-4 py-2 text-left">Action</th>
+                <th className="px-4 py-4 text-center">
+                  <span className="inline-flex items-center gap-2 text-xl">
+                    Id
+                    <img
+                      src="/src/assets/order-icon.png"
+                      alt="order"
+                      className="w-3 h-6"
+                    />
+                  </span>
+                </th>
+
+                <th className="px-4 py-4 text-center">
+                  <span className="inline-flex items-center gap-2 text-xl">
+                    Category Name
+                    <img
+                      src="/src/assets/order-icon.png"
+                      alt="order"
+                      className="w-3 h-6"
+                    />
+                  </span>
+                </th>
+                <th className="px-4 py-4 text-center">
+                  <span className="inline-flex items-center gap-2 text-xl">
+                    Image
+                  </span>
+                </th>
+                <th className="px-4 py-4 text-center">
+                  <span className="inline-flex items-center gap-2 text-xl">
+                    Status
+                    <img
+                      src="/src/assets/order-icon.png"
+                      alt="order"
+                      className="w-3 h-6"
+                    />
+                  </span>
+                </th>
+                <th className="px-4 py-4 text-center">
+                  <span className="inline-flex items-center gap-2 text-xl">
+                    Action
+                  </span>
+                </th>
               </tr>
             </thead>
 
-            <tbody>
+            <tbody className="text-center">
               {filteredCategories.map((cat, index) => (
-                <tr key={cat._id} className="border-t text-sm">
+                <tr key={cat._id} className="text-sm bg-[#F2F2F2] ">
                   <td className="px-4 py-2">{index + 1}</td>
                   <td className="px-4 py-2">{cat.name}</td>
-                  <td className="px-4 py-2">IMG</td>
-                  <td className="px-4 py-2">{cat.status}</td>
+                  <td className="px-4 py-2 text-center">
+                    <img
+                      src={cat.image}
+                      alt={cat.name}
+                      className="mx-auto w-10 h-10 object-cover rounded"
+                    />
+                  </td>
+
                   <td className="px-4 py-2">
-                    <span className="text-blue-600 cursor-pointer mr-3">
-                      Edit
+                    <span
+                      className={`px-2 py-1 rounded text-md font-medium ${
+                        cat.status === "active"
+                          ? " text-[#00A11A]"
+                          : " text-[#F70505]"
+                      }`}
+                    >
+                      {cat.status}
                     </span>
-                    <span className="text-red-600 cursor-pointer">Delete</span>
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <div className="flex justify-center items-center gap-4">
+                      <Link to={`/categories/${cat._id}/`}>
+                        <img
+                          src="/src/assets/edit-icon.png"
+                          alt="edit"
+                          className="cursor-pointer"
+                        />
+                      </Link>
+                      <Popup
+                        trigger={
+                          <img
+                            src="/src/assets/delete-icon.png"
+                            alt="delete"
+                            className="w-5 h-5 cursor-pointer mx-auto"
+                          />
+                        }
+                        modal
+                        nested
+                      >
+                        {(close) => (
+                          <div className="bg-white p-6 rounded-lg w-110 text-center shadow-2xl">
+                            <div className="flex justify-center gap-2">
+                              <img
+                                className="w-8 h-8"
+                                src="/src/assets/delete-danger.png"
+                                alt="danger"
+                              />
+                              <h3 className="text-lg font-extrabold mb-2">
+                                Delete
+                              </h3>
+                            </div>
+                            <p className="text-md text-gray-600 mb-6">
+                              Are you sure you want to delete this category?
+                            </p>
+
+                            <div className="flex justify-center gap-4">
+                              <button
+                                onClick={close}
+                                className="px-7 py-2 border border-[#767676] rounded-3xl text-md text-[#767676]"
+                              >
+                                Cancel
+                              </button>
+
+                              <button
+                                onClick={() => {
+                                  deleteCategory(cat._id);
+                                  close();
+                                }}
+                                className="px-7 py-2 bg-[#662671] text-white rounded-3xl text-sm"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </Popup>
+                    </div>
                   </td>
                 </tr>
               ))}
